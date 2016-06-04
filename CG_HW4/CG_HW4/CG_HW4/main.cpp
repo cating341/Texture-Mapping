@@ -792,7 +792,36 @@ void onKeyboard(unsigned char key, int x, int y) {
 			MAPPING = !MAPPING;
 			printf("MAPPING = %d\n", MAPPING);
 			break;
-
+		case 'M':
+			if(texture_mag_filter == GL_LINEAR){
+				texture_mag_filter = GL_NEAREST;
+				printf("MAG NEAREST\n");
+			}
+			else{
+				texture_mag_filter = GL_LINEAR;
+				printf("MAG LINEAR\n");
+			}
+			break;
+		case 'm':
+			if(texture_min_filter == GL_LINEAR){
+				texture_min_filter = GL_NEAREST;
+				printf("MIN NEAREST\n");
+			}
+			else{
+				texture_min_filter = GL_LINEAR;
+				printf("MIN LINEAR\n");
+			}
+			break;
+		case 'W': case'w':
+			if(texture_wrap_mode == GL_REPEAT){
+				texture_wrap_mode = GL_CLAMP_TO_EDGE;
+				printf("WRAP REPEAT\n");
+			}
+			else{
+				texture_wrap_mode = GL_REPEAT;
+				printf("WRAP CLAMP\n");
+			}
+			break;
 		case 27: // esc key
 			exit(0);
 	}
