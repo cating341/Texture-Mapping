@@ -62,6 +62,8 @@ GLint iLocTexCoord;
 GLint texture_wrap_mode = GL_REPEAT;
 GLint texture_mag_filter = GL_LINEAR;
 GLint texture_min_filter = GL_LINEAR;
+GLint iLocTexMap;
+int MAPPING = 1;
 
 // window size
 const unsigned int uiWidth  = 500;
@@ -621,6 +623,8 @@ void onDisplay(void)
 	glUniformMatrix4fv(iLocMVP, 1, GL_FALSE, M.get());
 	glUniformMatrix4fv(iLocModelMatrix, 1, GL_FALSE, modelMatrix.get());
 
+	glUniform1i(iLocTexMap, MAPPING);
+
 	GLMgroup* group = OBJ->groups;
 	int gCount = 0;
 	while(group){
@@ -697,6 +701,15 @@ void showHelp()
 	printf("\n");
 	printf("MODEL SWITCHING:   press Z / z to switch previous model.\n");
 	printf("                   press X / x to switch next model.\n");
+	printf("Texture:           press T / t to trigger texture mapping ON/OFF\n");
+	printf("MAG_FILTER:        press M to switch between GL_LINEAR/GL_NEAREST\n");
+	printf("MIN_FILTER:        press m to switch between GL_LINEAR/GL_NEAREST\n");
+	printf("TEXTURE_WRAP:      press W / w to switch between GL_REPEAT/GL_CLAMP_TO_EDGE\n");
+	printf("Ditectional Light: press 1 \n");
+	printf("Point Light:       press 2\n");
+	printf("Spot Light:        press 3\n");
+	printf("Lighting mode:     press v to switch vertex/fragment shader lighting");
+
 	printf("\n");
 }
 
@@ -774,6 +787,10 @@ void onKeyboard(unsigned char key, int x, int y) {
 				projectionMode = PROJECTION_PARA;
 				printf("parallel projection\n");
 			}
+			break;
+		case 'T': case 't':
+			MAPPING = !MAPPING;
+			printf("MAPPING = %d\n", MAPPING);
 			break;
 
 		case 27: // esc key
@@ -855,6 +872,8 @@ void setShaders() {
 	iLocMVP = glGetUniformLocation(p, "mvp");
 
 	iLocModelMatrix  = glGetUniformLocation(p, "um4modelMatrix");
+
+	iLocTexMap = glGetUniformLocation(p, "texMapping");
 	
 	glUseProgram(p);
 }
