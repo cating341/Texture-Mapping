@@ -143,11 +143,14 @@ void initTextures(int index)
 	// HINT: https://www.opengl.org/sdk/docs/man/docbook4/xhtml/glTexImage2D.xml
 	// glTexImage2D();
 	// GL_TEXTURE_2D, GL_RGB, GL_UNSIGNED_BYTE
+	glTexImage2D(GL_TEXTURE_2D, 0, 3, IH[index].Width, IH[index].Height, 0, GL_RGB, GL_UNSIGNED_BYTE, image[index]);/*const GLvoid * data ???*/
 
 	// TODO: Generate mipmap by using gl function NOT glu function.
 	// HINT: https://www.opengl.org/sdk/docs/man/docbook4/xhtml/glGenerateMipmap.xml
 	// glGenerateMipmap();
 	// GL_TEXTURE_2D
+	glGenerateMipmap(GL_TEXTURE_2D);
+
 }
 
 void setTexture() 
@@ -247,6 +250,21 @@ void TextureModel()
 			//OBJ->texcoords[indt2*2+1];
 			//OBJ->texcoords[indt3*2];
 			//OBJ->texcoords[indt3*2+1];
+			GLfloat tx, ty;
+			tx = OBJ->texcoords[indt1*2];
+			ty = OBJ->texcoords[indt1*2+1];
+			vtextures[gCount][i*6+0] = tx;
+			vtextures[gCount][i*6+1] = ty;
+
+			tx = OBJ->texcoords[indt2*2];
+			ty = OBJ->texcoords[indt2*2+1];
+			vtextures[gCount][i*6+2] = tx;
+			vtextures[gCount][i*6+3] = ty;
+
+			tx = OBJ->texcoords[indt3*2];
+			ty = OBJ->texcoords[indt3*2+1];
+			vtextures[gCount][i*6+4] = tx;
+			vtextures[gCount][i*6+5] = ty;
 		}
 		group = group->next;
 		gCount++;
@@ -517,7 +535,7 @@ void onDisplay(void)
 		//printf("waiting\n");
 	}
 
-	glClearColor(0.3f, 0.1f, 0.1f, 1.0f);
+	glClearColor(0.9f, 0.5f, 0.6f, 1.0f);
 	glClear(GL_COLOR_BUFFER_BIT | GL_DEPTH_BUFFER_BIT | GL_STENCIL_BUFFER_BIT);
 
 
@@ -610,32 +628,36 @@ void onDisplay(void)
 		glEnableVertexAttribArray(iLocPosition);
 		// TODO: texture VertexAttribArray is enabled here
 		// HINT: https://www.opengl.org/sdk/docs/man/docbook4/xhtml/glEnableVertexAttribArray.xml
-		// glEnableVertexAttribArray();
+		// glEnableVertexAttribArray(GLuint index);
+		glEnableVertexAttribArray(iLocTexCoord);
 
 		// bind attributes array
 		glVertexAttribPointer(iLocPosition, 3, GL_FLOAT, GL_FALSE, 0, vertices[gCount]);
 		// TODO: bind texture vertex attribute pointer here
 		// HINT: https://www.opengl.org/sdk/docs/man/docbook4/xhtml/glVertexAttribPointer.xml
-		// glVertexAttribPointer();
+		// glVertexAttribPointer(GLuint index, GLint size, GLenum type, GLboolean normalized, GLsizei stride, const GLvoid * pointer);
+		glVertexAttribPointer(iLocTexCoord, 2, GL_FLOAT, GL_FALSE, 0, vtextures[gCount]);
 
 		// bind texture material group by group
 		// This will bind your texture to the variable which type is "Sampler2D" in your shader.
 		// e.g. uniform sampler2D us2dtexture; // in shader.frag
 		// TODO: bind texture here
 		// HINT: https://www.opengl.org/sdk/docs/man/docbook4/xhtml/glBindTexture.xml
-		// glBindTexture
-		// GL_TEXTURE_2D
+		// glBindTexture(GLenum target, GLuint texture); // GL_TEXTURE_2D
+		glBindTexture(GL_TEXTURE_2D, texNum[gCount]);  
 
 		// texture mag/min filter
 		// TODO: texture mag/min filters are defined here
 		// HINT: https://www.khronos.org/opengles/sdk/docs/man/xhtml/glTexParameter.xml
-		// glTexParameteri();
+		// glTexParameteri(GLenum target, GLenum pname, GLint param);
 		// GL_TEXTURE_2D
 		// GL_TEXTURE_MAG_FILTER, GL_TEXTURE_MIN_FILTER
 		// GL_LINEAR, GL_NEAREST
 		// GL_LINEAR_MIPMAP_LINEAR, GL_LINEAR_MIPMAP_NEAREST
 		// GL_NEAREST_MIPMAP_LINEAR, GL_NEAREST_MIPMAP_NEAREST
-		
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MAG_FILTER, texture_mag_filter);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_MIN_FILTER, texture_min_filter);
+
 		// texture wrap mode s/t
 		// TODO: texture wrap modes are defined here
 		// HINT: https://www.khronos.org/opengles/sdk/docs/man/xhtml/glTexParameter.xml
@@ -643,6 +665,8 @@ void onDisplay(void)
 		// GL_TEXTURE_2D
 		// GL_TEXTURE_WRAP_S, GL_TEXTURE_WRAP_T
 		// GL_REPEAT, GL_MIRRORED_REPEAT, GL_CLAMP_TO_EDGE
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_S, texture_wrap_mode);
+		glTexParameteri(GL_TEXTURE_2D, GL_TEXTURE_WRAP_T, texture_wrap_mode);
 
 		// draw arrays
 		glDrawArrays(GL_TRIANGLES, 0, group->numtriangles*3);
@@ -897,7 +921,7 @@ int main(int argc, char **argv)
 	glutInitDisplayMode(GLUT_DEPTH | GLUT_DOUBLE | GLUT_RGBA);
 
 	// create window
-	glutInitWindowPosition(0, 0);
+	glutInitWindowPosition(800, 150);
 	glutInitWindowSize(uiWidth, uiHeight);
 	glutCreateWindow("10420 CS550000 CG HW4 TA");
 
